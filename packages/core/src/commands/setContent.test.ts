@@ -174,4 +174,37 @@ describe('setContent command', () => {
     })
     expect(editor.getHTML()).toContain('<h1>Tiptap</h1><p><strong>Hello World</strong></p>')
   })
+
+  it('replaces content with a non-empty JSONContent array', () => {
+    editor.commands.setContent([
+      {
+        type: 'paragraph',
+        content: [{ type: 'text', text: 'Hello' }],
+      },
+      {
+        type: 'paragraph',
+        content: [{ type: 'text', text: 'World' }],
+      },
+    ])
+    expect(editor.getHTML()).toContain('<p>Hello</p><p>World</p>')
+    expect(editor.getJSON()).toEqual({
+      type: 'doc',
+      content: [
+        {
+          type: 'paragraph',
+          content: [{ type: 'text', text: 'Hello' }],
+        },
+        {
+          type: 'paragraph',
+          content: [{ type: 'text', text: 'World' }],
+        },
+      ],
+    })
+  })
+
+  it('replaces content with an empty JSONContent array', () => {
+    editor.commands.setContent('<p>Initial</p>')
+    editor.commands.setContent([])
+    expect(editor.getJSON().type).toBe('doc')
+  })
 })

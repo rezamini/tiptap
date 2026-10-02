@@ -1,7 +1,9 @@
-import type { Fragment, Node as PMNode, ParseOptions, Schema } from '@tiptap/pm/model'
+import type { Node as PMNode, ParseOptions, Schema } from '@tiptap/pm/model'
+import { Fragment } from '@tiptap/pm/model'
 
 import type { Content } from '../types.js'
 import { createNodeFromContent } from './createNodeFromContent.js'
+import { isFragment } from './isFragment.js'
 
 /**
  * Create a new Prosemirror document node from content.
@@ -16,9 +18,16 @@ export function createDocument(
   parseOptions: ParseOptions = {},
   options: { errorOnInvalidContent?: boolean } = {},
 ): PMNode {
-  return createNodeFromContent(content, schema, {
+  const nodeOrFragment = createNodeFromContent(content, schema, {
     slice: false,
     parseOptions,
     errorOnInvalidContent: options.errorOnInvalidContent,
-  }) as PMNode
+  })
+
+  if (isFragment(nodeOrFragment)) {
+    // Re-hydrate via JSON so Fragments from a duplicate prosemirror-model copy still work.
+    return schema.topNodeType.create(null, Fragment.fromJSON(schema, nodeOrFragment.toJSON() ?? []))
+  }
+
+  return nodeOrFragment
 }

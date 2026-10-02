@@ -76,6 +76,45 @@ describe('Editor', () => {
   })
 })
 
+describe('JSONContent array content', () => {
+  it('initializes with a non-empty JSONContent array without throwing', () => {
+    const editor = new Editor({
+      element: document.createElement('div'),
+      extensions: [Document, Paragraph, Text],
+      content: [
+        {
+          type: 'paragraph',
+          content: [{ type: 'text', text: 'Hello' }],
+        },
+      ],
+    })
+
+    expect(editor.getText()).toBe('Hello')
+    expect(editor.getJSON()).toEqual({
+      type: 'doc',
+      content: [
+        {
+          type: 'paragraph',
+          content: [{ type: 'text', text: 'Hello' }],
+        },
+      ],
+    })
+
+    editor.destroy()
+  })
+
+  it('initializes with an empty array without throwing', () => {
+    const editor = new Editor({
+      element: document.createElement('div'),
+      extensions: [Document, Paragraph, Text],
+      content: [],
+    })
+
+    expect(editor.getJSON().type).toBe('doc')
+    editor.destroy()
+  })
+})
+
 describe('editorProps', () => {
   const editors: Editor[] = []
 
